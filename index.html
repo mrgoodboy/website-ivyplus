@@ -86,7 +86,7 @@
 
         const ballRadius = 8;
         let x = canvas.width / 2;
-        let y = canvas.height - 30;
+        let y = canvas.height - 60;
         let dx = 2;
         let dy = -2;
 
@@ -134,7 +134,7 @@
 
         function drawPaddle() {
             ctx.beginPath();
-            ctx.rect(paddleX, canvas.height - paddleHeight - 10, paddleWidth, paddleHeight);
+            ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
             ctx.fillStyle = "#444";
             ctx.fill();
             ctx.closePath();
@@ -185,7 +185,7 @@
                 } else {
                     showCountdown(5);
                     x = canvas.width / 2;
-                    y = canvas.height - 30;
+                    y = canvas.height - 60;
                     dx = 2 * difficultyLevel;
                     dy = -2 * difficultyLevel;
                     paddleX = (canvas.width - paddleWidth) / 2;
@@ -223,7 +223,7 @@
     <div class="note">
         Připravujeme pro vás hru pingpong, abyste si během čekání mohli na chvilku zahrát. <br>
         Ovládání: pomocí šipek vlevo a vpravo. <br><br>
-        Chúng tôi sẽ ra mắt trò chơi bóng bàn để bạn có thể giải trí trong lúc chờ đợi. <br>
+        Chúng tôi ra mắt trò chơi bóng bàn để bạn có thể giải trí trong lúc chờ đợi. <br>
         Điều khiển bằng phím mũi tên trái và phải.
     </div>
 </body>
