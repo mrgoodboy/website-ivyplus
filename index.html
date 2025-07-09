@@ -39,6 +39,7 @@
             display: block;
             margin-left: auto;
             margin-right: auto;
+            position: relative;
         }
         .note {
             margin-top: 40px;
@@ -49,14 +50,6 @@
             font-size: 18px;
             color: red;
             margin-top: 20px;
-        }
-        #scoreboard {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            text-align: right;
-            font-size: 16px;
-            color: #333;
         }
     </style>
 </head>
@@ -84,13 +77,9 @@
         </div>
     </div>
 
-    <div id="scoreboard">
-        <div>Skóre: <span id="score">0</span></div>
-        <div>Rekord: <span id="highscore">0</span></div>
-    </div>
-
     <canvas id="breakout" width="300" height="400"></canvas>
     <div id="countdown"></div>
+
     <script>
         const canvas = document.getElementById("breakout");
         const ctx = canvas.getContext("2d");
@@ -116,8 +105,8 @@
         let score = 0;
         let highscore = 0;
 
-        document.getElementById("score").textContent = score;
-        document.getElementById("highscore").textContent = highscore;
+        const paddleImage = new Image();
+        paddleImage.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Table_tennis_racket_icon.svg/120px-Table_tennis_racket_icon.svg.png';
 
         document.addEventListener("keydown", keyDownHandler);
         document.addEventListener("keyup", keyUpHandler);
@@ -147,11 +136,15 @@
         }
 
         function drawPaddle() {
-            ctx.beginPath();
-            ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-            ctx.fillStyle = "#0095DD";
-            ctx.fill();
-            ctx.closePath();
+            ctx.drawImage(paddleImage, paddleX, canvas.height - paddleHeight - 20, paddleWidth, 20);
+        }
+
+        function drawScoreboard() {
+            ctx.font = "14px Arial";
+            ctx.fillStyle = "#000";
+            ctx.textAlign = "right";
+            ctx.fillText("Skóre: " + score, canvas.width - 10, 20);
+            ctx.fillText("Rekord: " + highscore, canvas.width - 10, 40);
         }
 
         function showCountdown(seconds, message = "") {
@@ -176,6 +169,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBall();
             drawPaddle();
+            drawScoreboard();
 
             if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
                 dx = -dx;
@@ -183,11 +177,7 @@
             if (y + dy < ballRadius) {
                 dy = -dy;
                 score++;
-                document.getElementById("score").textContent = score;
-                if (score > highscore) {
-                    highscore = score;
-                    document.getElementById("highscore").textContent = highscore;
-                }
+                if (score > highscore) highscore = score;
             } else if (y + dy > canvas.height - ballRadius) {
                 if (x > paddleX && x < paddleX + paddleWidth) {
                     dy = -dy;
@@ -199,7 +189,6 @@
                     dy = -2 * difficultyLevel;
                     paddleX = (canvas.width - paddleWidth) / 2;
                     score = 0;
-                    document.getElementById("score").textContent = score;
                     return;
                 }
             }
@@ -227,7 +216,9 @@
             }
         }, 1000);
 
-        draw();
+        paddleImage.onload = function () {
+            draw();
+        };
     </script>
 
     <div class="note">
