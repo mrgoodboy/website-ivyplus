@@ -80,9 +80,13 @@
     <canvas id="breakout" width="300" height="400"></canvas>
     <div id="countdown"></div>
 
+    <audio id="pingSound" src="https://actions.google.com/sounds/v1/sports/table_tennis_ball_hit.ogg"></audio>
+
     <script>
         const canvas = document.getElementById("breakout");
         const ctx = canvas.getContext("2d");
+
+        const pingSound = document.getElementById("pingSound");
 
         const ballRadius = 8;
         let x = canvas.width / 2;
@@ -90,8 +94,8 @@
         let dx = 2;
         let dy = -2;
 
-        const paddleHeight = 20;
-        const paddleWidth = 75;
+        let paddleHeight = 10;
+        let paddleWidth = 60;
         let paddleX = (canvas.width - paddleWidth) / 2;
 
         let rightPressed = false;
@@ -104,6 +108,7 @@
         let totalTime = 0;
         let score = 0;
         let highscore = 0;
+        let lossCount = 0;
 
         document.addEventListener("keydown", keyDownHandler);
         document.addEventListener("keyup", keyUpHandler);
@@ -164,6 +169,18 @@
             }, 1000);
         }
 
+        function offerBiggerPaddle() {
+            paused = true;
+            document.getElementById("countdown").textContent = "Chcete větší pálku? (Automaticky ano za 3 sekundy)";
+            setTimeout(() => {
+                paddleWidth *= 1.2;
+                paddleX = (canvas.width - paddleWidth) / 2;
+                document.getElementById("countdown").textContent = "";
+                paused = false;
+                draw();
+            }, 3000);
+        }
+
         function draw() {
             if (paused) return;
 
@@ -174,15 +191,23 @@
 
             if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
                 dx = -dx;
+                pingSound.play();
             }
             if (y + dy < ballRadius) {
                 dy = -dy;
+                pingSound.play();
                 score++;
                 if (score > highscore) highscore = score;
             } else if (y + dy > canvas.height - ballRadius) {
                 if (x > paddleX && x < paddleX + paddleWidth) {
                     dy = -dy;
+                    pingSound.play();
                 } else {
+                    lossCount++;
+                    if (lossCount % 5 === 0) {
+                        offerBiggerPaddle();
+                        return;
+                    }
                     showCountdown(5);
                     x = canvas.width / 2;
                     y = canvas.height - 60;
@@ -223,7 +248,7 @@
     <div class="note">
         Připravujeme pro vás hru pingpong, abyste si během čekání mohli na chvilku zahrát. <br>
         Ovládání: pomocí šipek vlevo a vpravo. <br><br>
-        Chúng tôi ra mắt trò chơi bóng bàn để bạn có thể giải trí trong lúc chờ đợi. <br>
+        Chúng tôi sẽ ra mắt trò chơi bóng bàn để bạn có thể giải trí trong lúc chờ đợi. <br>
         Điều khiển bằng phím mũi tên trái và phải.
     </div>
 </body>
