@@ -105,9 +105,6 @@
         let score = 0;
         let highscore = 0;
 
-        const paddleImage = new Image();
-        paddleImage.src = 'https://i.imgur.com/HZXASVC.png'; // dřevěná pálka s logem IvyPlus
-
         document.addEventListener("keydown", keyDownHandler);
         document.addEventListener("keyup", keyUpHandler);
 
@@ -136,7 +133,11 @@
         }
 
         function drawPaddle() {
-            ctx.drawImage(paddleImage, paddleX, canvas.height - paddleHeight - 10, paddleWidth, paddleHeight);
+            ctx.beginPath();
+            ctx.rect(paddleX, canvas.height - paddleHeight - 10, paddleWidth, paddleHeight);
+            ctx.fillStyle = "#444";
+            ctx.fill();
+            ctx.closePath();
         }
 
         function drawScoreboard() {
@@ -182,7 +183,7 @@
                 if (x > paddleX && x < paddleX + paddleWidth) {
                     dy = -dy;
                 } else {
-                    showCountdown(10);
+                    showCountdown(5);
                     x = canvas.width / 2;
                     y = canvas.height - 30;
                     dx = 2 * difficultyLevel;
@@ -212,19 +213,17 @@
         setInterval(() => {
             totalTime++;
             if (totalTime === 600) {
-                showCountdown(15, "Nejsi tady už moc dlouho? | Bạn có đang ở đây quá lâu không?");
+                showCountdown(5, "Nejsi tady už moc dlouho? | Bạn có đang ở đây quá lâu không?");
             }
         }, 1000);
 
-        paddleImage.onload = function () {
-            draw();
-        };
+        draw();
     </script>
 
     <div class="note">
         Připravujeme pro vás hru pingpong, abyste si během čekání mohli na chvilku zahrát. <br>
         Ovládání: pomocí šipek vlevo a vpravo. <br><br>
-        Chúng tôi ra mắt trò chơi bóng bàn để bạn có thể giải trí trong lúc chờ đợi. <br>
+        Chúng tôi sẽ ra mắt trò chơi bóng bàn để bạn có thể giải trí trong lúc chờ đợi. <br>
         Điều khiển bằng phím mũi tên trái và phải.
     </div>
 </body>
