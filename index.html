@@ -34,17 +34,19 @@
         }
         canvas {
             display: block;
-            margin: 30px auto;
-            background-color: #000;
+            margin: 40px auto;
+            background-color: #f0f0f0;
+            position: relative;
         }
-        .scoreboard {
+        .score-overlay {
             position: absolute;
-            right: 30px;
-            top: 30px;
-            color: white;
-            font-size: 18px;
-            font-family: Arial, sans-serif;
-            text-align: right;
+            top: 75px;
+            right: 12%;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -62,87 +64,71 @@
             <p>Chúng tôi đang xây dựng lại trang web tại địa chỉ này.</p>
         </div>
 
+        <div class="lang-switch">
+            &#127760; CZ | VN
+        </div>
+
         <div class="contact">
             <p><strong>Email:</strong> <a href="mailto:pham@ivyplus.cz">pham@ivyplus.cz</a></p>
             <p><strong>Tel:</strong> <a href="tel:+420778081986">778 081 986</a></p>
         </div>
+    </div>
 
-        <div class="lang-switch">
-            &#127760; CZ | VN
+    <div style="position: relative; display: inline-block;">
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+        <div class="score-overlay">
+            🏓 Skóre: <span id="score">0</span><br>
+            🏆 Nejvyšší skóre: <span id="highScore">0</span><br>
+            ❌ Prohry: <span id="losses">0</span><br>
+            🏓 Điểm: <span id="score-vn">0</span><br>
+            🏆 Cao nhất: <span id="highScore-vn">0</span><br>
+            ❌ Thua: <span id="losses-vn">0</span>
         </div>
     </div>
 
-    <div class="scoreboard" id="scoreboard">
-        <div>Skóre / Điểm: <span id="score">0</span></div>
-        <div>Max skóre / Điểm cao nhất: <span id="maxScore">0</span></div>
-        <div>Prohry / Thua: <span id="losses">0</span></div>
-    </div>
-
-    <canvas id="pong" width="600" height="400"></canvas>
-    <audio id="pingSound">
-        <source src="https://freesound.org/data/previews/26/26104_255577-lq.mp3" type="audio/mpeg">
-    </audio>
-
     <script>
-        const canvas = document.getElementById("pong");
-        const ctx = canvas.getContext("2d");
-
-        const paddleWidthDefault = 100;
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let paddleWidth = 100;
         const paddleHeight = 10;
-        let paddleWidth = paddleWidthDefault;
-        let maxPaddleWidth = canvas.width * 0.6;
         let paddleX = (canvas.width - paddleWidth) / 2;
-        const ballRadius = 8;
         let ballX = canvas.width / 2;
         let ballY = canvas.height - 30;
+        let ballRadius = 10;
         let dx = 2;
         let dy = -2;
         let rightPressed = false;
         let leftPressed = false;
-
         let score = 0;
-        let maxScore = 0;
+        let highScore = 0;
         let losses = 0;
-        let difficultyTimer = 0;
-
-        const scoreEl = document.getElementById("score");
-        const maxScoreEl = document.getElementById("maxScore");
-        const lossesEl = document.getElementById("losses");
-        const pingSound = document.getElementById("pingSound");
+        let difficultyLevel = 1;
+        let totalTime = 0;
 
         document.addEventListener("keydown", keyDownHandler, false);
         document.addEventListener("keyup", keyUpHandler, false);
 
         function keyDownHandler(e) {
-            if(e.key === "Right" || e.key === "ArrowRight") {
-                rightPressed = true;
-            }
-            else if(e.key === "Left" || e.key === "ArrowLeft") {
-                leftPressed = true;
-            }
+            if(e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
+            else if(e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
         }
-
         function keyUpHandler(e) {
-            if(e.key === "Right" || e.key === "ArrowRight") {
-                rightPressed = false;
-            }
-            else if(e.key === "Left" || e.key === "ArrowLeft") {
-                leftPressed = false;
-            }
-        }
-
-        function drawBall() {
-            ctx.beginPath();
-            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2);
-            ctx.fillStyle = "#fff";
-            ctx.fill();
-            ctx.closePath();
+            if(e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
+            else if(e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
         }
 
         function drawPaddle() {
             ctx.beginPath();
             ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-            ctx.fillStyle = "#fff";
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2);
+            ctx.fillStyle = "#0095DD";
             ctx.fill();
             ctx.closePath();
         }
@@ -152,63 +138,45 @@
             drawBall();
             drawPaddle();
 
-            if(ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
-                dx = -dx;
-                pingSound.currentTime = 0;
-                pingSound.play();
-            }
-            if(ballY + dy < ballRadius) {
-                dy = -dy;
-                pingSound.currentTime = 0;
-                pingSound.play();
-            } else if(ballY + dy > canvas.height - ballRadius) {
+            if(ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
+            if(ballY + dy < ballRadius) dy = -dy;
+            else if(ballY + dy > canvas.height - ballRadius) {
                 if(ballX > paddleX && ballX < paddleX + paddleWidth) {
                     dy = -dy;
                     score++;
-                    if(score > maxScore) maxScore = score;
-                    pingSound.currentTime = 0;
-                    pingSound.play();
+                    if(score > highScore) highScore = score;
+                    document.getElementById("score").innerText = score;
+                    document.getElementById("highScore").innerText = highScore;
+                    document.getElementById("score-vn").innerText = score;
+                    document.getElementById("highScore-vn").innerText = highScore;
                 } else {
                     losses++;
+                    document.getElementById("losses").innerText = losses;
+                    document.getElementById("losses-vn").innerText = losses;
+                    if(losses % 5 === 0) {
+                        paddleWidth = Math.min(canvas.width * 0.6, paddleWidth * 1.2);
+                    }
                     score = 0;
-                    dx = 2;
-                    dy = -2;
-                    paddleWidth = Math.min(paddleWidthDefault, maxPaddleWidth);
-                    setTimeout(() => {
-                        ballX = canvas.width / 2;
-                        ballY = canvas.height - 30;
-                    }, 500);
+                    ballX = canvas.width/2;
+                    ballY = canvas.height - 30;
+                    dx = 2 * difficultyLevel;
+                    dy = -2 * difficultyLevel;
                 }
             }
 
-            if(rightPressed && paddleX < canvas.width - paddleWidth) {
-                paddleX += 7;
-            }
-            else if(leftPressed && paddleX > 0) {
-                paddleX -= 7;
-            }
+            if(rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 7;
+            else if(leftPressed && paddleX > 0) paddleX -= 7;
 
             ballX += dx;
             ballY += dy;
 
-            scoreEl.textContent = score;
-            maxScoreEl.textContent = maxScore;
-            lossesEl.textContent = losses;
-
-            difficultyTimer++;
-            if (difficultyTimer % (60 * 60) === 0) {
-                dx *= 1.1;
-                dy *= 1.1;
-            }
-
-            if (losses % 5 === 0 && losses !== 0 && paddleWidth < maxPaddleWidth) {
-                setTimeout(() => {
-                    paddleWidth = Math.min(paddleWidth * 1.2, maxPaddleWidth);
-                }, 3000);
-            }
-
             requestAnimationFrame(draw);
         }
+
+        setInterval(() => {
+            totalTime++;
+            if(totalTime % 60 === 0) difficultyLevel++;
+        }, 1000);
 
         draw();
     </script>
