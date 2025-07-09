@@ -33,23 +33,18 @@
             font-size: 16px;
         }
         canvas {
-            margin-top: 40px;
-            background: #eee;
-            border: 2px solid #555;
             display: block;
-            margin-left: auto;
-            margin-right: auto;
-            position: relative;
+            margin: 30px auto;
+            background-color: #000;
         }
-        .note {
-            margin-top: 40px;
-            font-size: 14px;
-            color: #666;
-        }
-        #countdown {
+        .scoreboard {
+            position: absolute;
+            right: 30px;
+            top: 30px;
+            color: white;
             font-size: 18px;
-            color: red;
-            margin-top: 20px;
+            font-family: Arial, sans-serif;
+            text-align: right;
         }
     </style>
 </head>
@@ -77,62 +72,69 @@
         </div>
     </div>
 
-    <canvas id="breakout" width="300" height="400"></canvas>
-    <div id="countdown"></div>
+    <div class="scoreboard" id="scoreboard">
+        <div>Skóre / Điểm: <span id="score">0</span></div>
+        <div>Max skóre / Điểm cao nhất: <span id="maxScore">0</span></div>
+        <div>Prohry / Thua: <span id="losses">0</span></div>
+    </div>
 
-    <audio id="pingSound" src="https://actions.google.com/sounds/v1/sports/table_tennis_ball_hit.ogg"></audio>
+    <canvas id="pong" width="600" height="400"></canvas>
+    <audio id="pingSound">
+        <source src="https://freesound.org/data/previews/26/26104_255577-lq.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
-        const canvas = document.getElementById("breakout");
+        const canvas = document.getElementById("pong");
         const ctx = canvas.getContext("2d");
 
-        const pingSound = document.getElementById("pingSound");
-
+        const paddleWidthDefault = 100;
+        const paddleHeight = 10;
+        let paddleWidth = paddleWidthDefault;
+        let maxPaddleWidth = canvas.width * 0.6;
+        let paddleX = (canvas.width - paddleWidth) / 2;
         const ballRadius = 8;
-        let x = canvas.width / 2;
-        let y = canvas.height - 60;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height - 30;
         let dx = 2;
         let dy = -2;
-
-        let paddleHeight = 10;
-        let paddleWidth = 60;
-        let paddleX = (canvas.width - paddleWidth) / 2;
-
         let rightPressed = false;
         let leftPressed = false;
 
-        let paused = false;
-        let countdown = 0;
-        let difficultyLevel = 1;
-
-        let totalTime = 0;
         let score = 0;
-        let highscore = 0;
-        let lossCount = 0;
+        let maxScore = 0;
+        let losses = 0;
+        let difficultyTimer = 0;
 
-        document.addEventListener("keydown", keyDownHandler);
-        document.addEventListener("keyup", keyUpHandler);
+        const scoreEl = document.getElementById("score");
+        const maxScoreEl = document.getElementById("maxScore");
+        const lossesEl = document.getElementById("losses");
+        const pingSound = document.getElementById("pingSound");
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
 
         function keyDownHandler(e) {
-            if (e.key === "Right" || e.key === "ArrowRight") {
+            if(e.key === "Right" || e.key === "ArrowRight") {
                 rightPressed = true;
-            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+            }
+            else if(e.key === "Left" || e.key === "ArrowLeft") {
                 leftPressed = true;
             }
         }
 
         function keyUpHandler(e) {
-            if (e.key === "Right" || e.key === "ArrowRight") {
+            if(e.key === "Right" || e.key === "ArrowRight") {
                 rightPressed = false;
-            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+            }
+            else if(e.key === "Left" || e.key === "ArrowLeft") {
                 leftPressed = false;
             }
         }
 
         function drawBall() {
             ctx.beginPath();
-            ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
-            ctx.fillStyle = "#0095DD";
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2);
+            ctx.fillStyle = "#fff";
             ctx.fill();
             ctx.closePath();
         }
@@ -140,116 +142,75 @@
         function drawPaddle() {
             ctx.beginPath();
             ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-            ctx.fillStyle = "#444";
+            ctx.fillStyle = "#fff";
             ctx.fill();
             ctx.closePath();
         }
 
-        function drawScoreboard() {
-            ctx.font = "14px Arial";
-            ctx.fillStyle = "#000";
-            ctx.textAlign = "right";
-            ctx.fillText("Skóre: " + score, canvas.width - 10, 20);
-            ctx.fillText("Rekord: " + highscore, canvas.width - 10, 40);
-        }
-
-        function showCountdown(seconds, message = "") {
-            countdown = seconds;
-            paused = true;
-            document.getElementById("countdown").textContent = message + ` Hra pozastavena na ${countdown} sekund...`;
-            const interval = setInterval(() => {
-                countdown--;
-                document.getElementById("countdown").textContent = message + ` Hra pozastavena na ${countdown} sekund...`;
-                if (countdown <= 0) {
-                    clearInterval(interval);
-                    document.getElementById("countdown").textContent = "";
-                    paused = false;
-                    draw();
-                }
-            }, 1000);
-        }
-
-        function offerBiggerPaddle() {
-            paused = true;
-            document.getElementById("countdown").textContent = "Chcete větší pálku? (Automaticky ano za 3 sekundy)";
-            setTimeout(() => {
-                paddleWidth *= 1.2;
-                paddleX = (canvas.width - paddleWidth) / 2;
-                document.getElementById("countdown").textContent = "";
-                paused = false;
-                draw();
-            }, 3000);
-        }
-
         function draw() {
-            if (paused) return;
-
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBall();
             drawPaddle();
-            drawScoreboard();
 
-            if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+            if(ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
                 dx = -dx;
+                pingSound.currentTime = 0;
                 pingSound.play();
             }
-            if (y + dy < ballRadius) {
+            if(ballY + dy < ballRadius) {
                 dy = -dy;
+                pingSound.currentTime = 0;
                 pingSound.play();
-                score++;
-                if (score > highscore) highscore = score;
-            } else if (y + dy > canvas.height - ballRadius) {
-                if (x > paddleX && x < paddleX + paddleWidth) {
+            } else if(ballY + dy > canvas.height - ballRadius) {
+                if(ballX > paddleX && ballX < paddleX + paddleWidth) {
                     dy = -dy;
+                    score++;
+                    if(score > maxScore) maxScore = score;
+                    pingSound.currentTime = 0;
                     pingSound.play();
                 } else {
-                    lossCount++;
-                    if (lossCount % 5 === 0) {
-                        offerBiggerPaddle();
-                        return;
-                    }
-                    showCountdown(5);
-                    x = canvas.width / 2;
-                    y = canvas.height - 60;
-                    dx = 2 * difficultyLevel;
-                    dy = -2 * difficultyLevel;
-                    paddleX = (canvas.width - paddleWidth) / 2;
+                    losses++;
                     score = 0;
-                    return;
+                    dx = 2;
+                    dy = -2;
+                    paddleWidth = Math.min(paddleWidthDefault, maxPaddleWidth);
+                    setTimeout(() => {
+                        ballX = canvas.width / 2;
+                        ballY = canvas.height - 30;
+                    }, 500);
                 }
             }
 
-            if (rightPressed && paddleX < canvas.width - paddleWidth) {
-                paddleX += 5;
-            } else if (leftPressed && paddleX > 0) {
-                paddleX -= 5;
+            if(rightPressed && paddleX < canvas.width - paddleWidth) {
+                paddleX += 7;
+            }
+            else if(leftPressed && paddleX > 0) {
+                paddleX -= 7;
             }
 
-            x += dx;
-            y += dy;
+            ballX += dx;
+            ballY += dy;
+
+            scoreEl.textContent = score;
+            maxScoreEl.textContent = maxScore;
+            lossesEl.textContent = losses;
+
+            difficultyTimer++;
+            if (difficultyTimer % (60 * 60) === 0) {
+                dx *= 1.1;
+                dy *= 1.1;
+            }
+
+            if (losses % 5 === 0 && losses !== 0 && paddleWidth < maxPaddleWidth) {
+                setTimeout(() => {
+                    paddleWidth = Math.min(paddleWidth * 1.2, maxPaddleWidth);
+                }, 3000);
+            }
 
             requestAnimationFrame(draw);
         }
 
-        setInterval(() => {
-            difficultyLevel++;
-        }, 60000);
-
-        setInterval(() => {
-            totalTime++;
-            if (totalTime === 600) {
-                showCountdown(5, "Nejsi tady už moc dlouho? | Bạn có đang ở đây quá lâu không?");
-            }
-        }, 1000);
-
         draw();
     </script>
-
-    <div class="note">
-        Připravujeme pro vás hru pingpong, abyste si během čekání mohli na chvilku zahrát. <br>
-        Ovládání: pomocí šipek vlevo a vpravo. <br><br>
-        Chúng tôi ra mắt trò chơi bóng bàn để bạn có thể giải trí trong lúc chờ đợi. <br>
-        Điều khiển bằng phím mũi tên trái và phải.
-    </div>
 </body>
 </html>
