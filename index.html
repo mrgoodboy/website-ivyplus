@@ -50,6 +50,14 @@
             color: red;
             margin-top: 20px;
         }
+        #scoreboard {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            font-size: 16px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -76,6 +84,11 @@
         </div>
     </div>
 
+    <div id="scoreboard">
+        <div>Skóre: <span id="score">0</span></div>
+        <div>Rekord: <span id="highscore">0</span></div>
+    </div>
+
     <canvas id="breakout" width="300" height="400"></canvas>
     <div id="countdown"></div>
     <script>
@@ -97,8 +110,14 @@
 
         let paused = false;
         let countdown = 0;
-
         let difficultyLevel = 1;
+
+        let totalTime = 0;
+        let score = 0;
+        let highscore = 0;
+
+        document.getElementById("score").textContent = score;
+        document.getElementById("highscore").textContent = highscore;
 
         document.addEventListener("keydown", keyDownHandler);
         document.addEventListener("keyup", keyUpHandler);
@@ -135,20 +154,20 @@
             ctx.closePath();
         }
 
-        function showCountdown(seconds) {
+        function showCountdown(seconds, message = "") {
             countdown = seconds;
             paused = true;
-            document.getElementById("countdown").textContent = `Hra pozastavena na ${countdown} sekund...`;
+            document.getElementById("countdown").textContent = message + ` Hra pozastavena na ${countdown} sekund...`;
             const interval = setInterval(() => {
                 countdown--;
-                document.getElementById("countdown").textContent = `Hra pozastavena na ${countdown} sekund...`;
+                document.getElementById("countdown").textContent = message + ` Hra pozastavena na ${countdown} sekund...`;
                 if (countdown <= 0) {
                     clearInterval(interval);
                     document.getElementById("countdown").textContent = "";
                     paused = false;
                     draw();
                 }
-            }, 500);
+            }, 1000);
         }
 
         function draw() {
@@ -163,6 +182,12 @@
             }
             if (y + dy < ballRadius) {
                 dy = -dy;
+                score++;
+                document.getElementById("score").textContent = score;
+                if (score > highscore) {
+                    highscore = score;
+                    document.getElementById("highscore").textContent = highscore;
+                }
             } else if (y + dy > canvas.height - ballRadius) {
                 if (x > paddleX && x < paddleX + paddleWidth) {
                     dy = -dy;
@@ -173,6 +198,8 @@
                     dx = 2 * difficultyLevel;
                     dy = -2 * difficultyLevel;
                     paddleX = (canvas.width - paddleWidth) / 2;
+                    score = 0;
+                    document.getElementById("score").textContent = score;
                     return;
                 }
             }
@@ -191,7 +218,14 @@
 
         setInterval(() => {
             difficultyLevel++;
-        }, 30000); // každých 30 sekund zvyš složitost
+        }, 60000);
+
+        setInterval(() => {
+            totalTime++;
+            if (totalTime === 600) {
+                showCountdown(15, "Nejsi tady už moc dlouho? | Bạn có đang ở đây quá lâu không?");
+            }
+        }, 1000);
 
         draw();
     </script>
