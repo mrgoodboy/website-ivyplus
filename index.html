@@ -45,6 +45,11 @@
             font-size: 14px;
             color: #666;
         }
+        #countdown {
+            font-size: 18px;
+            color: red;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -71,8 +76,8 @@
         </div>
     </div>
 
-    <!-- Jednoduchá hra Breakout -->
     <canvas id="breakout" width="300" height="400"></canvas>
+    <div id="countdown"></div>
     <script>
         const canvas = document.getElementById("breakout");
         const ctx = canvas.getContext("2d");
@@ -89,6 +94,11 @@
 
         let rightPressed = false;
         let leftPressed = false;
+
+        let paused = false;
+        let countdown = 0;
+
+        let difficultyLevel = 1;
 
         document.addEventListener("keydown", keyDownHandler);
         document.addEventListener("keyup", keyUpHandler);
@@ -125,7 +135,25 @@
             ctx.closePath();
         }
 
+        function showCountdown(seconds) {
+            countdown = seconds;
+            paused = true;
+            document.getElementById("countdown").textContent = `Hra pozastavena na ${countdown} sekund...`;
+            const interval = setInterval(() => {
+                countdown--;
+                document.getElementById("countdown").textContent = `Hra pozastavena na ${countdown} sekund...`;
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    document.getElementById("countdown").textContent = "";
+                    paused = false;
+                    draw();
+                }
+            }, 1000);
+        }
+
         function draw() {
+            if (paused) return;
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBall();
             drawPaddle();
@@ -139,8 +167,13 @@
                 if (x > paddleX && x < paddleX + paddleWidth) {
                     dy = -dy;
                 } else {
-                    alert("Konec hry");
-                    document.location.reload();
+                    showCountdown(10);
+                    x = canvas.width / 2;
+                    y = canvas.height - 30;
+                    dx = 2 * difficultyLevel;
+                    dy = -2 * difficultyLevel;
+                    paddleX = (canvas.width - paddleWidth) / 2;
+                    return;
                 }
             }
 
@@ -155,6 +188,10 @@
 
             requestAnimationFrame(draw);
         }
+
+        setInterval(() => {
+            difficultyLevel++;
+        }, 60000); // každých 60 sekund zvyš složitost
 
         draw();
     </script>
