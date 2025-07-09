@@ -9,31 +9,34 @@
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
             text-align: center;
-            padding: 20px; /* Reduced padding for better layout */
+            padding: 10px;
             color: #333;
-            display: flex; /* Use flexbox for layout */
+            display: flex;
             flex-direction: column;
             align-items: center;
+            margin: 0;
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Standard syntax */
         }
         .logo {
-            max-width: 200px;
-            margin-bottom: 20px;
+            max-width: 180px;
+            margin-bottom: 15px;
         }
         .container {
             background-color: #fff;
-            padding: 20px; /* Reduced padding */
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            max-width: 500px;
-            width: 100%; /* Make it responsive */
-            box-sizing: border-box; /* Include padding in width */
-            margin-bottom: 20px; /* Space between info and game */
+            max-width: 95%;
+            width: 500px;
+            box-sizing: border-box;
         }
         .lang-switch {
             margin-top: 20px;
             font-size: 14px;
-            cursor: pointer; /* Indicate it's clickable */
-            color: #007bff; /* Link-like color */
+            cursor: pointer;
+            color: #007bff;
         }
         .lang-switch span.active {
             font-weight: bold;
@@ -43,22 +46,27 @@
             margin-top: 20px;
             font-size: 15px;
         }
-        canvas {
-            display: block;
-            margin: 20px auto; /* Adjusted margin */
-            border: 2px solid #333;
-            background-color: #e0e0e0;
-            cursor: none; /* Hide default cursor during gameplay */
-        }
-        .score-board {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            display: flex; /* Arrange scores horizontally */
-            justify-content: space-around;
+        .game-section {
             width: 100%;
             max-width: 500px;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            margin-top: 20px;
+        }
+        canvas {
+            display: block;
+            margin: 10px auto;
+            border: 2px solid #333;
+            background-color: #e0e0e0;
+            width: 100%; /* Make canvas responsive */
+            box-sizing: border-box;
+            touch-action: none; /* Prevent scrolling on canvas */
+        }
+        .score-board {
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            flex-wrap: wrap;
         }
         .score-item {
             margin: 5px 10px;
@@ -84,8 +92,8 @@
             background-color: #0056b3;
         }
         #gameOverScreen {
-            display: none; /* Hidden by default */
-            position: absolute;
+            display: none;
+            position: fixed; /* Use fixed to cover the whole screen */
             top: 0;
             left: 0;
             width: 100%;
@@ -95,7 +103,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 2em;
+            font-size: 1.5em;
             z-index: 10;
         }
         #gameOverScreen h2 {
@@ -113,11 +121,17 @@
         #gameOverScreen button:hover {
             background-color: #218838;
         }
-        /* Language specific classes to hide/show content */
         .cz-content { display: block; }
         .vn-content { display: none; }
         body.vn .cz-content { display: none; }
         body.vn .vn-content { display: block; }
+        hr {
+            border: 0;
+            height: 1px;
+            background: #ddd;
+            width: 80%;
+            margin: 25px auto;
+        }
     </style>
 </head>
 <body>
@@ -128,32 +142,33 @@
             <h1>Stránky jsou v přestavbě</h1>
             <p>Na této adrese právě připravujeme nový web.</p>
         </div>
-
         <div class="vn-content">
             <h1>Trang web đang được nâng cấp</h1>
             <p>Chúng tôi đang xây dựng lại trang web tại địa chỉ này.</p>
         </div>
-
         <div class="contact">
             <p><strong>Email:</strong> <a href="mailto:pham@ivyplus.cz">pham@ivyplus.cz</a></p>
             <p><strong>Tel:</strong> <a href="tel:+420778081986">778 081 986</a></p>
         </div>
-
         <div class="lang-switch">
             <span id="langCz" class="active">Čeština</span> | <span id="langVn">Tiếng Việt</span>
         </div>
     </div>
 
-    <div class="score-board">
-        <div class="score-item cz-content">Skóre: <span id="scoreCz">0</span> | Nejvyšší skóre: <span id="highScoreCz">0</span> | Životy: <span id="livesCz">3</span></div>
-        <div class="score-item vn-content">Điểm số: <span id="scoreVn">0</span> | Điểm cao nhất: <span id="highScoreVn">0</span> | Mạng: <span id="livesVn">3</span></div>
-    </div>
+    <hr>
 
-    <canvas id="gameCanvas" width="500" height="400"></canvas> <div class="game-controls">
-        <button id="startGameCz" class="cz-content">Začít hru</button>
-        <button id="resetGameCz" class="cz-content" style="display: none;">Resetovat hru</button>
-        <button id="startGameVn" class="vn-content">Bắt đầu trò chơi</button>
-        <button id="resetGameVn" class="vn-content" style="display: none;">Khởi động lại</button>
+    <div class="game-section">
+        <div class="score-board">
+            <div class="score-item cz-content">Skóre: <span id="scoreCz">0</span> | Nej. skóre: <span id="highScoreCz">0</span> | Životy: <span id="livesCz">3</span></div>
+            <div class="score-item vn-content">Điểm: <span id="scoreVn">0</span> | Cao nhất: <span id="highScoreVn">0</span> | Mạng: <span id="livesVn">3</span></div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="game-controls">
+            <button id="startGameCz" class="cz-content">Začít hru</button>
+            <button id="resetGameCz" class="cz-content" style="display: none;">Resetovat hru</button>
+            <button id="startGameVn" class="vn-content">Bắt đầu</button>
+            <button id="resetGameVn" class="vn-content" style="display: none;">Khởi động lại</button>
+        </div>
     </div>
 
     <div id="gameOverScreen">
@@ -168,6 +183,11 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Set canvas resolution (internal drawing size)
+        canvas.width = 500;
+        canvas.height = 400;
+
         const scoreCzSpan = document.getElementById('scoreCz');
         const highScoreCzSpan = document.getElementById('highScoreCz');
         const livesCzSpan = document.getElementById('livesCz');
@@ -183,350 +203,14 @@
         const finalScoreVnSpan = document.getElementById('finalScoreVn');
         const playAgainCzButton = document.getElementById('playAgainCz');
         const playAgainVnButton = document.getElementById('playAgainVn');
-
-        // Language switch elements
         const langCzButton = document.getElementById('langCz');
         const langVnButton = document.getElementById('langVn');
 
-        let gameInterval; // To control game loop
+        let gameInterval;
         let isGameRunning = false;
 
-        // Game variables
         let paddleWidth = 100;
         const paddleHeight = 10;
         let paddleX = (canvas.width - paddleWidth) / 2;
 
-        let ballRadius = 10;
-        let ballX = canvas.width / 2;
-        let ballY = canvas.height - 30;
-        let dx = 3; // Increased initial speed for more dynamic play
-        let dy = -3;
-
-        let rightPressed = false;
-        let leftPressed = false;
-
-        let score = 0;
-        let highScore = localStorage.getItem('highScore') ? parseInt(localStorage.getItem('highScore')) : 0;
-        let lives = 3;
-
-        const brickRowCount = 5;
-        const brickColumnCount = 6; // More bricks
-        const brickWidth = 75;
-        const brickHeight = 20;
-        const brickPadding = 10;
-        const brickOffsetTop = 30;
-        const brickOffsetLeft = 30;
-        let bricks = [];
-
-        // Power-up variables
-        const powerUpTypes = ['enlargePaddle', 'speedBall', 'extraLife'];
-        let activePowerUps = [];
-
-        function initBricks() {
-            bricks = [];
-            for (let c = 0; c < brickColumnCount; c++) {
-                bricks[c] = [];
-                for (let r = 0; r < brickRowCount; r++) {
-                    bricks[c][r] = { x: 0, y: 0, status: 1 }; // Status 1 means active
-                }
-            }
-        }
-
-        function drawBricks() {
-            for (let c = 0; c < brickColumnCount; c++) {
-                for (let r = 0; r < brickRowCount; r++) {
-                    if (bricks[c][r].status === 1) {
-                        const brickX = (c * (brickWidth + brickPadding)) + brickOffsetLeft;
-                        const brickY = (r * (brickHeight + brickPadding)) + brickOffsetTop;
-                        bricks[c][r].x = brickX;
-                        bricks[c][r].y = brickY;
-                        ctx.beginPath();
-                        ctx.rect(brickX, brickY, brickWidth, brickHeight);
-                        ctx.fillStyle = "#8B4513"; // Brown color for bricks
-                        ctx.fill();
-                        ctx.closePath();
-                    }
-                }
-            }
-        }
-
-        function collisionDetection() {
-            for (let c = 0; c < brickColumnCount; c++) {
-                for (let r = 0; r < brickRowCount; r++) {
-                    const b = bricks[c][r];
-                    if (b.status === 1) {
-                        if (ballX > b.x && ballX < b.x + brickWidth && ballY > b.y && ballY < b.y + brickHeight) {
-                            dy = -dy;
-                            b.status = 0; // Brick broken
-                            score++;
-                            updateScoreBoard();
-
-                            // Chance to drop a power-up
-                            if (Math.random() < 0.2) { // 20% chance
-                                dropPowerUp(b.x + brickWidth / 2, b.y + brickHeight);
-                            }
-
-                            // Check if all bricks are broken
-                            let allBricksBroken = true;
-                            for (let col = 0; col < brickColumnCount; col++) {
-                                for (let row = 0; row < brickRowCount; row++) {
-                                    if (bricks[col][row].status === 1) {
-                                        allBricksBroken = false;
-                                        break;
-                                    }
-                                }
-                                if (!allBricksBroken) break;
-                            }
-                            if (allBricksBroken) {
-                                nextLevel();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        function dropPowerUp(x, y) {
-            const type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
-            activePowerUps.push({ x: x, y: y, type: type, radius: 8, dy: 1 }); // Power-ups fall down
-        }
-
-        function drawPowerUps() {
-            activePowerUps.forEach(pu => {
-                ctx.beginPath();
-                ctx.arc(pu.x, pu.y, pu.radius, 0, Math.PI * 2);
-                let color;
-                switch (pu.type) {
-                    case 'enlargePaddle': color = 'purple'; break;
-                    case 'speedBall': color = 'orange'; break;
-                    case 'extraLife': color = 'green'; break;
-                }
-                ctx.fillStyle = color;
-                ctx.fill();
-                ctx.closePath();
-            });
-        }
-
-        function updatePowerUps() {
-            activePowerUps.forEach((pu, index) => {
-                pu.y += pu.dy;
-
-                // Check for collision with paddle
-                if (pu.y + pu.radius > canvas.height - paddleHeight &&
-                    pu.x > paddleX && pu.x < paddleX + paddleWidth) {
-                    applyPowerUp(pu.type);
-                    activePowerUps.splice(index, 1); // Remove power-up
-                } else if (pu.y > canvas.height) {
-                    activePowerUps.splice(index, 1); // Remove if it goes off screen
-                }
-            });
-        }
-
-        function applyPowerUp(type) {
-            switch (type) {
-                case 'enlargePaddle':
-                    paddleWidth = Math.min(canvas.width * 0.8, paddleWidth * 1.3); // Max 80% width
-                    break;
-                case 'speedBall':
-                    dx *= 1.2;
-                    dy *= 1.2;
-                    break;
-                case 'extraLife':
-                    lives++;
-                    break;
-            }
-            updateScoreBoard();
-        }
-
-        function keyDownHandler(e) {
-            if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
-            else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
-        }
-
-        function keyUpHandler(e) {
-            if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
-            else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
-        }
-
-        function mouseMoveHandler(e) {
-            const relativeX = e.clientX - canvas.offsetLeft;
-            if (relativeX > 0 && relativeX < canvas.width) {
-                paddleX = relativeX - paddleWidth / 2;
-                if (paddleX < 0) paddleX = 0;
-                if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
-            }
-        }
-
-        function drawPaddle() {
-            ctx.beginPath();
-            ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-            ctx.fillStyle = "#0095DD";
-            ctx.fill();
-            ctx.closePath();
-        }
-
-        function drawBall() {
-            ctx.beginPath();
-            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-            ctx.fillStyle = "#0095DD";
-            ctx.fill();
-            ctx.closePath();
-        }
-
-        function updateScoreBoard() {
-            scoreCzSpan.innerText = score;
-            highScoreCzSpan.innerText = highScore;
-            livesCzSpan.innerText = lives;
-
-            scoreVnSpan.innerText = score;
-            highScoreVnSpan.innerText = highScore;
-            livesVnSpan.innerText = lives;
-
-            // Update local storage for high score
-            if (score > highScore) {
-                highScore = score;
-                localStorage.setItem('highScore', highScore);
-            }
-        }
-
-        function resetBallAndPaddle() {
-            ballX = canvas.width / 2;
-            ballY = canvas.height - 30;
-            dx = 3; // Reset speed
-            dy = -3;
-            paddleX = (canvas.width - paddleWidth) / 2;
-        }
-
-        function gameOver() {
-            isGameRunning = false;
-            clearInterval(gameInterval);
-            gameOverScreen.style.display = 'flex';
-            finalScoreCzSpan.innerText = score;
-            finalScoreVnSpan.innerText = score;
-            startGameCzButton.style.display = 'none';
-            startGameVnButton.style.display = 'none';
-            resetGameCzButton.style.display = 'block';
-            resetGameVnButton.style.display = 'block';
-            document.removeEventListener("keydown", keyDownHandler, false);
-            document.removeEventListener("keyup", keyUpHandler, false);
-            document.removeEventListener("mousemove", mouseMoveHandler, false);
-        }
-
-        function resetGame() {
-            score = 0;
-            lives = 3;
-            paddleWidth = 100; // Reset paddle size
-            initBricks();
-            resetBallAndPaddle();
-            updateScoreBoard();
-            gameOverScreen.style.display = 'none';
-            startGameCzButton.style.display = 'block';
-            startGameVnButton.style.display = 'block';
-            resetGameCzButton.style.display = 'none';
-            resetGameVnButton.style.display = 'none';
-        }
-
-        function nextLevel() {
-            score += 100; // Bonus points for completing a level
-            dx *= 1.1; // Increase ball speed slightly
-            dy *= 1.1;
-            paddleWidth = Math.max(50, paddleWidth * 0.9); // Make paddle slightly smaller
-            initBricks(); // Reset bricks for next level
-            resetBallAndPaddle(); // Reset ball position
-            updateScoreBoard();
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBricks();
-            drawBall();
-            drawPaddle();
-            drawPowerUps();
-            collisionDetection();
-            updatePowerUps();
-
-            if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
-            if (ballY + dy < ballRadius) dy = -dy;
-            else if (ballY + dy > canvas.height - ballRadius) {
-                if (ballX > paddleX && ballX < paddleX + paddleWidth) {
-                    dy = -dy;
-                    // Adjust ball angle based on where it hits the paddle
-                    const hitPoint = ballX - (paddleX + paddleWidth / 2);
-                    dx = hitPoint * 0.1; // More dynamic bounce
-                } else {
-                    lives--;
-                    updateScoreBoard();
-                    if (lives <= 0) {
-                        gameOver();
-                    } else {
-                        resetBallAndPaddle();
-                    }
-                }
-            }
-
-            if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 7;
-            else if (leftPressed && paddleX > 0) paddleX -= 7;
-
-            ballX += dx;
-            ballY += dy;
-        }
-
-        function startGame() {
-            if (!isGameRunning) {
-                isGameRunning = true;
-                initBricks();
-                resetBallAndPaddle(); // Ensure ball is at starting position
-                updateScoreBoard(); // Initial score board update
-                startGameCzButton.style.display = 'none';
-                startGameVnButton.style.display = 'none';
-                resetGameCzButton.style.display = 'block';
-                resetGameVnButton.style.display = 'block';
-                document.addEventListener("keydown", keyDownHandler, false);
-                document.addEventListener("keyup", keyUpHandler, false);
-                document.addEventListener("mousemove", mouseMoveHandler, false); // Mouse control
-                gameInterval = setInterval(draw, 10); // Game loop every 10ms
-            }
-        }
-
-        // Event listeners for game controls
-        startGameCzButton.addEventListener('click', startGame);
-        startGameVnButton.addEventListener('click', startGame);
-        resetGameCzButton.addEventListener('click', resetGame);
-        resetGameVnButton.addEventListener('click', resetGame);
-        playAgainCzButton.addEventListener('click', resetGame);
-        playAgainVnButton.addEventListener('click', resetGame);
-
-        // Language switch functionality
-        function setLanguage(lang) {
-            document.body.classList.toggle('vn', lang === 'vn');
-            langCzButton.classList.toggle('active', lang === 'cz');
-            langVnButton.classList.toggle('active', lang === 'vn');
-            // Hide/show relevant game buttons based on language
-            if (isGameRunning) {
-                startGameCzButton.style.display = 'none';
-                startGameVnButton.style.display = 'none';
-                resetGameCzButton.style.display = (lang === 'cz' ? 'block' : 'none');
-                resetGameVnButton.style.display = (lang === 'vn' ? 'block' : 'none');
-            } else {
-                startGameCzButton.style.display = (lang === 'cz' ? 'block' : 'none');
-                startGameVnButton.style.display = (lang === 'vn' ? 'block' : 'none');
-                resetGameCzButton.style.display = 'none';
-                resetGameVnButton.style.display = 'none';
-            }
-            gameOverScreen.style.display = 'none'; // Hide game over screen on language change
-        }
-
-        langCzButton.addEventListener('click', () => setLanguage('cz'));
-        langVnButton.addEventListener('click', () => setLanguage('vn'));
-
-        // Initial setup
-        updateScoreBoard();
-        initBricks(); // Initialize bricks on page load
-        // Draw initial state once
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawBricks();
-        drawBall();
-        drawPaddle();
-    </script>
-</body>
-</html>
+        let ballRadius
