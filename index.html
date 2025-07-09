@@ -90,7 +90,7 @@
         let dx = 2;
         let dy = -2;
 
-        const paddleHeight = 10;
+        const paddleHeight = 20;
         const paddleWidth = 75;
         let paddleX = (canvas.width - paddleWidth) / 2;
 
@@ -106,7 +106,7 @@
         let highscore = 0;
 
         const paddleImage = new Image();
-        paddleImage.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Table_tennis_racket_icon.svg/120px-Table_tennis_racket_icon.svg.png';
+        paddleImage.src = 'https://i.imgur.com/HZXASVC.png'; // dřevěná pálka s logem IvyPlus
 
         document.addEventListener("keydown", keyDownHandler);
         document.addEventListener("keyup", keyUpHandler);
@@ -136,7 +136,7 @@
         }
 
         function drawPaddle() {
-            ctx.drawImage(paddleImage, paddleX, canvas.height - paddleHeight - 20, paddleWidth, 20);
+            ctx.drawImage(paddleImage, paddleX, canvas.height - paddleHeight - 10, paddleWidth, paddleHeight);
         }
 
         function drawScoreboard() {
