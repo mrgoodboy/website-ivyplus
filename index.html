@@ -34,19 +34,14 @@
         }
         canvas {
             display: block;
-            margin: 40px auto;
-            background-color: #f0f0f0;
-            position: relative;
+            margin: 30px auto;
+            border: 2px solid #333;
+            background-color: #e0e0e0;
         }
-        .score-overlay {
-            position: absolute;
-            top: 75px;
-            right: 12%;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 14px;
-            line-height: 1.4;
+        .score-board {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -64,27 +59,28 @@
             <p>Chúng tôi đang xây dựng lại trang web tại địa chỉ này.</p>
         </div>
 
-        <div class="lang-switch">
-            &#127760; CZ | VN
-        </div>
-
         <div class="contact">
             <p><strong>Email:</strong> <a href="mailto:pham@ivyplus.cz">pham@ivyplus.cz</a></p>
             <p><strong>Tel:</strong> <a href="tel:+420778081986">778 081 986</a></p>
         </div>
-    </div>
 
-    <div style="position: relative; display: inline-block;">
-        <canvas id="gameCanvas" width="600" height="400"></canvas>
-        <div class="score-overlay">
-            🏓 Skóre: <span id="score">0</span><br>
-            🏆 Nejvyšší skóre: <span id="highScore">0</span><br>
-            ❌ Prohry: <span id="losses">0</span><br>
-            🏓 Điểm: <span id="score-vn">0</span><br>
-            🏆 Cao nhất: <span id="highScore-vn">0</span><br>
-            ❌ Thua: <span id="losses-vn">0</span>
+        <div class="lang-switch">
+            &#127760; CZ | VN
         </div>
     </div>
+
+    <div class="score-board" id="scoreBoard">
+        Skóre: 0 | Nejvyšší skóre: 0 | Proher: 0<br>
+        Điểm số: 0 | Điểm cao nhất: 0 | Thua: 0
+    </div>
+
+    <canvas id="gameCanvas" width="500" height="300"></canvas>
+
+    <script>
+        // Sem se vloží JavaScript pro hru s odkazem na prvek scoreBoard
+    </script>
+</body>
+</html>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
